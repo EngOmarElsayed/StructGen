@@ -45,7 +45,7 @@ struct GenratedCodeQuickActionView: View {
             ScrollView {
                 Group {
                     if generatedOutput.isEmpty {
-                        Text(isThereError ? errorMessage!: "Paste JSON on the left...")
+                        Text(isThereError ? errorMessage ?? "": "Paste JSON on the left...")
                             .font(.system(.body, design: .monospaced))
                             .foregroundStyle(isThereError ? .red: .secondary)
                     } else {
