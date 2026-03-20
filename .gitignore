@@ -34,6 +34,9 @@ Icon
 timeline.xctimeline
 playground.xcworkspace
 
+# Release artifacts
+release/
+
 # Misc
 *.swp
 *~
