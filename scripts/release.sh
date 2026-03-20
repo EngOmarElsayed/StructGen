@@ -127,14 +127,63 @@ cp -R "$APP_PATH" "$TEMP_DIR/"
 # Create a symlink to /Applications for drag-install
 ln -s /Applications "$TEMP_DIR/Applications"
 
-# Create the DMG
+# Create a read/write DMG first (so we can style it)
+RW_DMG_PATH="$OUTPUT_DIR/${APP_NAME}-rw.dmg"
+[[ -f "$RW_DMG_PATH" ]] && rm -f "$RW_DMG_PATH"
+
 hdiutil create \
     -volname "$APP_NAME" \
     -srcfolder "$TEMP_DIR" \
     -ov \
-    -format UDZO \
-    "$DMG_PATH" \
+    -format UDRW \
+    "$RW_DMG_PATH" \
     >/dev/null 2>&1
+
+[[ -f "$RW_DMG_PATH" ]] || error "Failed to create read/write .dmg"
+
+# Mount the read/write DMG
+MOUNT_POINT=$(hdiutil attach -readwrite -noverify "$RW_DMG_PATH" | grep "/Volumes/" | awk '{print $NF}')
+[[ -d "$MOUNT_POINT" ]] || error "Failed to mount .dmg"
+
+info "Styling DMG window..."
+
+osascript <<APPLESCRIPT
+tell application "Finder"
+    tell disk "$APP_NAME"
+        open
+        set current view of container window to icon view
+        set toolbar visible of container window to false
+        set statusbar visible of container window to false
+        set the bounds of container window to {100, 100, 700, 530}
+        set theViewOptions to the icon view options of container window
+        set arrangement of theViewOptions to not arranged
+        set icon size of theViewOptions to 128
+        set text size of theViewOptions to 10
+        set label position of theViewOptions to bottom
+        set position of item "${APP_NAME}.app" of container window to {150, 180}
+        set position of item "Applications" of container window to {450, 180}
+        close
+        open
+        update without registering applications
+        delay 2
+        close
+    end tell
+end tell
+APPLESCRIPT
+
+sync
+
+# Unmount
+hdiutil detach "$MOUNT_POINT" >/dev/null 2>&1
+
+# Convert to compressed read-only DMG
+hdiutil convert \
+    "$RW_DMG_PATH" \
+    -format UDZO \
+    -o "$DMG_PATH" \
+    >/dev/null 2>&1
+
+rm -f "$RW_DMG_PATH"
 
 [[ -f "$DMG_PATH" ]] || error "Failed to create .dmg"
 
