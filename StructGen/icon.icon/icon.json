@@ -1,0 +1,30 @@
+{
+  "fill" : "system-dark",
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "fill" : {
+            "solid" : "extended-srgb:0.20392,0.78039,0.34902,1.00000"
+          },
+          "image-name" : "_{}_ 4.png",
+          "name" : "_{}_ 4"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
